@@ -1,6 +1,6 @@
-## This script will set up an ArchLinuxARM chroot environment, at "/sdcard/archroot".
+# This script will set up an ArchLinuxARM chroot environment, at "/sdcard/archroot".
 
-# WARNING - READ THE NEXT SECTION BEFORE DOING ANYTHING
+## WARNING - READ THE NEXT SECTION BEFORE DOING ANYTHING
 
 I'm not responsible for any damage you *might* do to your device.  
 I made this script for my personal use, but i think some people will find it quite useful, so i shared it, but i can't guarantee that it will work properly on every device.  
@@ -37,4 +37,21 @@ Optional: If you want to install kde plasma, run:
 `echo "export $(dbus-launch)" >> /etc/profile`  
 
 If everything went okay, now you should have a working archlinuxarm chroot environment!  
-You will find the mount, unmount, and start scripts at "/sdcard/archroot"!
+You will find the mount, unmount, and start scripts at "/sdcard/archroot"!  
+
+## Some more info:  
+
+I used this to get around the limitations of systemd in chroot: https://github.com/smaknsk/servicectl  
+You can install tigervnc and run `vncserver :0` if you want a vnc server.  
+
+Desktop environments that i tried:  
+* Xfce - works fine.
+* Lxde - works fine.
+* Plasma - works, but it throws some errors in termux when i connected to it with vnc, it didn't load with x11.
+
+Issues:  
+* Ping doesn't work for me.
+* Dns resolving on user accounts doesn't work for me.
+* I modified the makepkg command to not check for root, but even then i couldn't install AUR packages, because it ran into some errors with fakeroot.  
+
+Let me know if you know how to fix these issues, thank you!
