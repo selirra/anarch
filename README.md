@@ -19,7 +19,7 @@ Things you need before you can run the installer:
 
 Open Termux, and install the required dependencies, you can skip this step if you already have them installed.  
 `pkg upgrade`  
-`pkg install wget bsdtar`  
+`pkg install git wget bsdtar`  
 
 Download, and then run the script as root.  
 `git clone https://github.com/selirra/ArchRoot`  
