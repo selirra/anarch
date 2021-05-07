@@ -4,7 +4,8 @@
 
 I'm not responsible for any damage you *might* do to your device.  
 I made this script for my personal use, but i think some people will find it quite useful, so i shared it, but i can't guarantee that it will work properly on every device.  
-Make sure to read the script, don't just blindly run random scripts off the internet. :)
+Make sure to read the script, don't just blindly run random scripts off the internet. :)  
+If you wish to delete your archroot folder, make sure to unmount it first.
 
 
 ## Installation guide
