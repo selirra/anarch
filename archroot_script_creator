@@ -1,0 +1,26 @@
+#!/bin/bash
+echo "#!/bin/bash" > /sdcard/archroot/archroot_mount
+echo "losetup /dev/block/loop7 /sdcard/archroot/disk.img" >> /sdcard/archroot/archroot_mount
+echo "mount -t ext4 /dev/block/loop7 /sdcard/archroot/root" >> /sdcard/archroot/archroot_mount
+echo "mount -o bind /dev /sdcard/archroot/root/dev" >> /sdcard/archroot/archroot_mount
+echo "mount -t proc proc /sdcard/archroot/root/proc" >> /sdcard/archroot/archroot_mount
+echo "mount -t sysfs sysfs /sdcard/archroot/root/sys" >> /sdcard/archroot/archroot_mount
+echo "mount -t tmpfs tmpfs /sdcard/archroot/root/tmp" >> /sdcard/archroot/archroot_mount
+echo "mount -t devpts devpts /sdcard/archroot/root/dev/pts" >> /sdcard/archroot/archroot_mount
+echo "mount -o bind /sdcard /sdcard/archroot/root/sdcard" >> /sdcard/archroot/archroot_mount
+
+echo "#!/bin/bash" > /sdcard/archroot/archroot_unmount
+echo "umount -l /sdcard/archroot/root/sdcard" >> /sdcard/archroot/archroot_unmount
+echo "umount -l /sdcard/archroot/root/dev/pts" >> /sdcard/archroot/archroot_unmount
+echo "umount -l /sdcard/archroot/root/tmp" >> /sdcard/archroot/archroot_unmount
+echo "umount -l /sdcard/archroot/root/sys" >> /sdcard/archroot/archroot_unmount
+echo "umount -l /sdcard/archroot/root/proc" >> /sdcard/archroot/archroot_unmount
+echo "umount -l /sdcard/archroot/root/dev" >> /sdcard/archroot/archroot_unmount
+echo "umount -l /sdcard/archroot/root" >> /sdcard/archroot/archroot_unmount
+echo "losetup -d /dev/block/loop7" >> /sdcard/archroot/archroot_unmount
+
+echo "#!/bin/bash" > /sdcard/archroot/archroot_start
+echo "chroot /sdcard/archroot/root /bin/bash -l" > /sdcard/archroot/archroot_start
+
+# Created by Selirra
+# https://github.com/selirra/ArchRoot
