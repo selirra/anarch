@@ -26,11 +26,11 @@ Download, and then run the script as root.
 `su`  
 `bash archroot_install`  
 
-After the installation finishes, and you are inside the chroot, run these:
+After the installation finishes, and you are inside the chroot, run these:  
 `pacman-key --init && pacman-key --populate`  
 `pacman -Sy archlinux-keyring archlinuxarm-keyring && pacman -Su`  
 
-Create a password for the root user with `passwd`  
+Create a password for the root user with `passwd`.  
 
 Optional: If you want to install kde plasma, run:  
 `echo "export $(dbus-launch)" >> /etc/profile`  
