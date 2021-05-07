@@ -36,4 +36,5 @@ Create a password for the root user with `passwd`.
 Optional: If you want to install kde plasma, run:  
 `echo "export $(dbus-launch)" >> /etc/profile`  
 
-If everything went okay, now you should have a working archlinuxarm chroot environment!
+If everything went okay, now you should have a working archlinuxarm chroot environment!  
+You will find the mount, unmount, and start scripts at "/sdcard/archroot"!
