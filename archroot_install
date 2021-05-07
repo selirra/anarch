@@ -1,0 +1,58 @@
+#!bin/bash
+mkdir /sdcard/archroot
+mkdir /sdcard/archroot/root
+cd /sdcard/archroot
+truncate -s 64G disk.img
+mkfs.ext4 disk.img
+wget -O archlinuxarm.tar.gz http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz
+losetup /dev/block/loop7 /sdcard/archroot/disk.img
+mount -t ext4 /dev/block/loop7 /sdcard/archroot/root
+cd /sdcard/archroot/root
+tar -xvf /sdcard/archroot/archlinuxarm.tar.gz
+rm /sdcard/archroot/archlinuxarm.tar.gz
+
+rm /sdcard/archroot/root/etc/resolv.conf
+echo "nameserver 8.8.8.8" > /sdcard/archroot/root/etc/resolv.conf
+echo "export HOME=/root" >> /sdcard/archroot/root/etc/profile
+echo "unset LD_PRELOAD" >> /sdcard/archroot/root/etc/profile
+echo "cd ~" >> /sdcard/archroot/root/etc/profile
+echo "clear" >> /sdcard/archroot/root/etc/profile
+
+mount -o bind /dev /sdcard/archroot/root/dev
+mount -t proc proc /sdcard/archroot/root/proc
+mount -t sysfs sysfs /sdcard/archroot/root/sys
+mount -t tmpfs tmpfs /sdcard/archroot/root/tmp
+mount -t devpts devpts /sdcard/archroot/root/dev/pts
+mkdir /sdcard/archroot/root/sdcard
+mount -o bind /sdcard /sdcard/archroot/root/sdcard
+
+
+echo "#!/bin/bash" > /sdcard/archroot/archroot_mount
+echo "losetup /dev/block/loop7 /sdcard/archroot/disk.img" >> /sdcard/archroot/archroot_mount
+echo "mount -t ext4 /dev/block/loop7 /sdcard/archroot/root" >> /sdcard/archroot/archroot_mount
+echo "mount -o bind /dev /sdcard/archroot/root/dev" >> /sdcard/archroot/archroot_mount
+echo "mount -t proc proc /sdcard/archroot/root/proc" >> /sdcard/archroot/archroot_mount
+echo "mount -t sysfs sysfs /sdcard/archroot/root/sys" >> /sdcard/archroot/archroot_mount
+echo "mount -t tmpfs tmpfs /sdcard/archroot/root/tmp" >> /sdcard/archroot/archroot_mount
+echo "mount -t devpts devpts /sdcard/archroot/root/dev/pts" >> /sdcard/archroot/archroot_mount
+echo "mount -o bind /sdcard /sdcard/archroot/root/sdcard" >> /sdcard/archroot/archroot_mount
+
+
+echo "#!/bin/bash" > /sdcard/archroot/archroot_unmount
+echo "umount -l /sdcard/archroot/root/sdcard" >> /sdcard/archroot/archroot_unmount
+echo "umount -l /sdcard/archroot/root/dev/pts" >> /sdcard/archroot/archroot_unmount
+echo "umount -l /sdcard/archroot/root/tmp" >> /sdcard/archroot/archroot_unmount
+echo "umount -l /sdcard/archroot/root/sys" >> /sdcard/archroot/archroot_unmount
+echo "umount -l /sdcard/archroot/root/proc" >> /sdcard/archroot/archroot_unmount
+echo "umount -l /sdcard/archroot/root/dev" >> /sdcard/archroot/archroot_unmount
+echo "umount -l /sdcard/archroot/root" >> /sdcard/archroot/archroot_unmount
+echo "losetup -d /dev/block/loop7" >> /sdcard/archroot/archroot_unmount
+
+echo "#!/bin/bash" > /sdcard/archroot/archroot_start
+echo "chroot /sdcard/archroot/root /bin/bash -l" > /sdcard/archroot/archroot_start
+
+
+chroot /sdcard/archroot/root /bin/bash -l
+
+# Created by Selirra
+# https://github.com/selirra/ArchRoot
