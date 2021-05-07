@@ -21,6 +21,8 @@ Open Termux, and install the required dependencies, you can skip this step if yo
 `pkg upgrade`  
 `pkg install git wget bsdtar`  
 
+## Important! The installer script will make an 8GB .img file by default, you can increase it's size by editing the installer script's fifth row! (truncate -s 8G disk.img)
+
 Download, and then run the script as root.  
 `git clone https://github.com/selirra/ArchRoot`  
 `cd ArchRoot`  
