@@ -2,7 +2,7 @@
 mkdir /sdcard/archroot
 mkdir /sdcard/archroot/root
 cd /sdcard/archroot
-truncate -s 64G disk.img
+truncate -s 8G disk.img
 mkfs.ext4 disk.img
 wget -O archlinuxarm.tar.gz http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz
 losetup /dev/block/loop7 /sdcard/archroot/disk.img
