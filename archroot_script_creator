@@ -20,7 +20,7 @@ echo "umount -l /sdcard/archroot/root" >> /sdcard/archroot/archroot_unmount
 echo "losetup -d /dev/block/loop7" >> /sdcard/archroot/archroot_unmount
 
 echo "#!/bin/bash" > /sdcard/archroot/archroot_start
-echo "chroot /sdcard/archroot/root /bin/bash -l" > /sdcard/archroot/archroot_start
+echo "chroot /sdcard/archroot/root /bin/bash -l" >> /sdcard/archroot/archroot_start
 
 # Created by Selirra
 # https://github.com/selirra/ArchRoot
