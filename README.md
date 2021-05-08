@@ -46,10 +46,19 @@ You will find the mount, unmount, and start scripts at "/sdcard/archroot"!
 I used this to get around the limitations of systemd in chroot: https://github.com/smaknsk/servicectl  
 You can install tigervnc and run `vncserver :0` if you want a vnc server.  
 
+Setting up the locale settings:  
+* Edit "/etc/locale.gen" with the text editor of your choice, and uncomment your desired locale.  
+* Run `locale-gen`, then run `echo "LANG=en_US.UTF-8" > /etc/locale.conf`. (replace "en_US.UTF-8" with the locale that you uncommented in locale.gen)  
+* To make the changes permament, run `echo "unset LANG" >> /etc/profile` and `echo "source /etc/profile.d/locale.sh" >> /etc/profile`.  
+
+Setting up timezone settings:
+* Run `ln -sf /usr/share/zoneinfo/Zone/SubZone /etc/localtime`, make sure to replace "Zone" and "Subzone" in the command.
+* This is an example: `ln -sf /usr/share/zoneinfo/Europe/Budapest /etc/localtime`
+
 Desktop environments that i tried:  
 * Xfce - works fine.
 * Lxde - works fine.
-* Plasma - works, but it throws some errors in termux when i connected to it with vnc, it didn't load with x11.
+* Plasma - works, but it throws some errors in termux when i connected to it with vnc, it didn't load with x11.  
 
 Issues:  
 * Ping doesn't work for me.
