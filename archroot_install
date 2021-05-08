@@ -1,4 +1,6 @@
 #!bin/bash
+
+# Creating the directory structure, and getting and extracting the rootfs.
 mkdir /sdcard/archroot
 mkdir /sdcard/archroot/root
 cd /sdcard/archroot
@@ -11,6 +13,7 @@ cd /sdcard/archroot/root
 tar -xvf /sdcard/archroot/archlinuxarm.tar.gz
 rm /sdcard/archroot/archlinuxarm.tar.gz
 
+# Setting up dns and home dir in the chroot env.
 rm /sdcard/archroot/root/etc/resolv.conf
 echo "nameserver 8.8.8.8" > /sdcard/archroot/root/etc/resolv.conf
 echo "export HOME=/root" >> /sdcard/archroot/root/etc/profile
@@ -18,15 +21,19 @@ echo "unset LD_PRELOAD" >> /sdcard/archroot/root/etc/profile
 echo "cd ~" >> /sdcard/archroot/root/etc/profile
 echo "clear" >> /sdcard/archroot/root/etc/profile
 
+# Mounting /dev, /dev/pts, /proc, /sys, /tmp inside the chroot.
 mount -o bind /dev /sdcard/archroot/root/dev
 mount -t proc proc /sdcard/archroot/root/proc
 mount -t sysfs sysfs /sdcard/archroot/root/sys
 mount -t tmpfs tmpfs /sdcard/archroot/root/tmp
 mount -t devpts devpts /sdcard/archroot/root/dev/pts
+
+# Mounting your internal storage inside the chroot.
+# You are free to comment this out if you do not want it mounted.
 mkdir /sdcard/archroot/root/sdcard
 mount -o bind /sdcard /sdcard/archroot/root/sdcard
 
-
+# Creating the mount script in your archroot dir.
 echo "#!/bin/bash" > /sdcard/archroot/archroot_mount
 echo "losetup /dev/block/loop7 /sdcard/archroot/disk.img" >> /sdcard/archroot/archroot_mount
 echo "mount -t ext4 /dev/block/loop7 /sdcard/archroot/root" >> /sdcard/archroot/archroot_mount
@@ -37,7 +44,7 @@ echo "mount -t tmpfs tmpfs /sdcard/archroot/root/tmp" >> /sdcard/archroot/archro
 echo "mount -t devpts devpts /sdcard/archroot/root/dev/pts" >> /sdcard/archroot/archroot_mount
 echo "mount -o bind /sdcard /sdcard/archroot/root/sdcard" >> /sdcard/archroot/archroot_mount
 
-
+# Creating the unmount script in your archroot dir.
 echo "#!/bin/bash" > /sdcard/archroot/archroot_unmount
 echo "umount -l /sdcard/archroot/root/sdcard" >> /sdcard/archroot/archroot_unmount
 echo "umount -l /sdcard/archroot/root/dev/pts" >> /sdcard/archroot/archroot_unmount
@@ -48,10 +55,11 @@ echo "umount -l /sdcard/archroot/root/dev" >> /sdcard/archroot/archroot_unmount
 echo "umount -l /sdcard/archroot/root" >> /sdcard/archroot/archroot_unmount
 echo "losetup -d /dev/block/loop7" >> /sdcard/archroot/archroot_unmount
 
+# Creating the start script in your archroot dir.
 echo "#!/bin/bash" > /sdcard/archroot/archroot_start
 echo "chroot /sdcard/archroot/root /bin/bash -l" >> /sdcard/archroot/archroot_start
 
-
+# Chrooting into your arch rootfs.
 chroot /sdcard/archroot/root /bin/bash -l
 
 # Created by Selirra
