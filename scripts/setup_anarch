@@ -54,7 +54,7 @@ install_directory_structure()
 	echo
 
 	wget -O archlinuxarm.tar.gz http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz
-	losetup -f $settings_path/anarch/disk.img
+	losetup /dev/block/loop3 $settings_path/anarch/disk.img
 	mount -t ext4 /dev/block/loop7 $settings_path/anarch/root
 	cd $settings_path/anarch/root
 
@@ -112,7 +112,7 @@ install_create_scripts()
 	echo
 
 	echo "#!/bin/bash" > $settings_path/anarch/mount_anarch
-	echo "losetup -f disk.img" >> $settings_path/anarch/mount_anarch
+	echo "losetup /dev/block/loop3 disk.img" >> $settings_path/anarch/mount_anarch
 	echo "mount -t ext4 /dev/block/loop7 root" >> $settings_path/anarch/mount_anarch
 	echo "mount -o bind /dev root/dev" >> $settings_path/anarch/mount_anarch
 	echo "mount -t proc  proc root/proc" >> $settings_path/anarch/mount_anarch
