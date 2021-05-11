@@ -57,7 +57,8 @@ You will find the mount, unmount, and start scripts at "/your/installation/path/
 * This is an example: `ln -sf /usr/share/zoneinfo/Europe/Budapest /etc/localtime`
 
 ### Desktop environments that i tried:  
-* Xfce, LXDE, and Plasma works without major errors.
+* Xfce, LXDE, and Plasma works without major errors.  
+* After installing Plasma, run `echo "export $(dbus-launch)" >> /etc/profile`.
 
 ### Issues:  
 * Ping doesn't work for me.
