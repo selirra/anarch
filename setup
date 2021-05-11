@@ -1,0 +1,75 @@
+#!/bin/bash
+for all in scripts/*;
+    do source $all
+done
+
+clear
+
+decoration_message _ "Checking root access."
+check_root
+
+echo
+
+decoration_message _ "Where do you want to install the rootfs?"
+decoration_text_centered "(/path/of/your/choice)"
+settings_get_path
+
+echo
+
+decoration_message _ "Checking available storage space."
+check_available_space
+
+echo
+
+decoration_message _ "Enter your virtual disk's size!"
+decoration_text_centered "(4GB - ${settings_available_space}GB)"
+settings_get_disksize
+
+echo
+
+decoration_message _ "Do you want to mount your internal storage in the container?"
+decoration_text_centered "(Yes / No)"
+settings_get_mountstorage
+
+echo
+
+decoration_line _
+decoration_text_centered "Installation path: $settings_path"
+decoration_text_centered "Virtual disk size: ${settings_disksize}GB"
+decoration_text_centered "Mount internal storage: $settings_mountstorage"
+
+echo
+decoration_message _ "Are these settings correct?"
+decoration_text_centered "(Yes / No)"
+settings_verification
+
+echo
+
+decoration_message ~ "Starting installation..."
+decoration_text_centered "Do not turn off your device!"
+install_base
+
+echo
+
+decoration_message ~ "Setting up your profile..."
+install_profile
+
+echo
+
+decoration_message ~ "Mounting the filesystem..."
+install_mount
+
+echo
+
+decoration_message ~ "Creating startup scripts..."
+install_scripts
+
+echo
+
+decoration_message ~ "Setting up the package manager..."
+install_misc
+
+echo
+
+
+install_finished

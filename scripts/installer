@@ -1,79 +1,24 @@
-#!/bin/bash
-
-clear
-
-check_root()
+install_base()
 {
-	if [[ $EUID -ne 0 ]]
-	then
-	   echo "This script must be run as root" 
-	   exit 1
-	else
-		settings_get
-	fi
-}
-
-check_available_space()
-{
-    N=$2
-    DISKLOC=$1
-    DISKINFO=$(df -h $DISKLOC)
-    settings_available_space=$(echo $DISKINFO | awk -v N=$N '{print $N}' | tr -d G)
-}
-
-decoration_line()
-{
-	printf '%*s\n' "${COLUMNS:-$(tput cols)}" | tr ' ' $1
-}
-
-decoration_text_centered()
-{
-	title=$1
-	printf '%*s\n' $(((${#title}+$COLUMNS)/2)) "$title"
-}
-
-install_directory_structure()
-{
-	decoration_line _
-	decoration_text_centered "Creating directories..."
-	echo
-
 	mkdir $settings_path/anarch
 	mkdir $settings_path/anarch/root
 	cd $settings_path/anarch
 
-	decoration_line _
-	decoration_text_centered "Creating disk.img..."
-	echo
-
 	truncate -s ${settings_disksize}G disk.img
 	mkfs.ext4 disk.img
-
-	decoration_line _
-	decoration_text_centered "Downloading the latest rootfs..."
-	echo
 
 	wget -O archlinuxarm.tar.gz http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz
 	losetup /dev/block/loop3 $settings_path/anarch/disk.img
 	mount -t ext4 /dev/block/loop3 $settings_path/anarch/root
 	cd $settings_path/anarch/root
 
-	decoration_line _
-	decoration_text_centered "Extracting the rootfs, please wait..."
-	decoration_text_centered "This can be slow, depending on your device."
-	echo
-
 	tar -xf $settings_path/anarch/archlinuxarm.tar.gz
 	rm $settings_path/anarch/archlinuxarm.tar.gz
 	cd $settings_path/anarch
 }
 
-install_profile_setup()
+install_profile()
 {
-	decoration_line _
-	decoration_text_centered "Setting up your profile file..."
-	echo
-
 	rm $settings_path/anarch/root/etc/resolv.conf
 	echo "nameserver 8.8.8.8" > $settings_path/anarch/root/etc/resolv.conf
 	echo "export HOME=/root" >> $settings_path/anarch/root/etc/profile
@@ -83,33 +28,21 @@ install_profile_setup()
 
 install_mount()
 {
-	decoration_line _
-	decoration_text_centered "Mounting dev, devpts, proc, sys, and tmp..."
-	echo
-
 	mount -o bind /dev $settings_path/anarch/root/dev
 	mount -t proc proc $settings_path/anarch/root/proc
 	mount -t sysfs sysfs $settings_path/anarch/root/sys
 	mount -t tmpfs tmpfs $settings_path/anarch/root/tmp
 	mount -t devpts devpts $settings_path/anarch/root/dev/pts
-
-	if [ $settings_mountstorage = "yes" ]
-	then
-		decoration_line _
-		decoration_text_centered "Mounting your internal storage..."
-		echo
-
-		mkdir $settings_path/anarch/root/sdcard
-		mount -o bind /sdcard $settings_path/anarch/root/sdcard
-	fi
 }
 
-install_create_scripts()
+install_mount_internal()
 {
-	decoration_line _
-	decoration_text_centered "Creating mount, unmount, and start scripts in your anarch directory..."
-	echo
+	mkdir $settings_path/anarch/root/sdcard
+	mount -o bind /sdcard $settings_path/anarch/root/sdcard
+}
 
+install_scripts()
+{
 	echo "#!/bin/bash" > $settings_path/anarch/mount_anarch
 	echo "losetup /dev/block/loop3 disk.img" >> $settings_path/anarch/mount_anarch
 	echo "mount -t ext4 /dev/block/loop3 root" >> $settings_path/anarch/mount_anarch
@@ -118,19 +51,16 @@ install_create_scripts()
 	echo "mount -t sysfs sysfs root/sys" >> $settings_path/anarch/mount_anarch
 	echo "mount -t tmpfs tmpfs root/tmp" >> $settings_path/anarch/mount_anarch
 	echo "mount -t devpts devpts root/dev/pts" >> $settings_path/anarch/mount_anarch
-
-	if [ $settings_mountstorage = "yes" ]
+    if [ $settings_mountstorage = "yes" ]
 	then
 		echo "mount -o bind /sdcard root/sdcard" >> $settings_path/anarch/mount_anarch
 	fi
 	
 	echo "#!/bin/bash" > $settings_path/anarch/unmount_anarch
-
 	if [ $settings_mountstorage = "yes" ]
 	then
 		echo "umount -l root/sdcard" >> $settings_path/anarch/unmount_anarch
 	fi	
-
 	echo "umount -l root/dev/pts" >> $settings_path/anarch/unmount_anarch
 	echo "umount -l root/tmp" >> $settings_path/anarch/unmount_anarch
 	echo "umount -l root/sys" >> $settings_path/anarch/unmount_anarch
@@ -143,22 +73,14 @@ install_create_scripts()
 	echo "chroot root /bin/bash -l" >> $settings_path/anarch/start_anarch
 }
 
-install_misc_setup()
+install_misc()
 {
-	decoration_line _
-	decoration_text_centered "Removing kernel, and firmware packages..."
-	echo
-
 	sed -i 's/#IgnorePkg   =/IgnorePkg   = linux-aarch64 linux-firmware/' $settings_path/anarch/root/etc/pacman.conf
 
 	echo "#!/bin/bash" > $settings_path/anarch/root/tmp/delete_stuff
 	echo "pacman -Rs linux-aarch64 linux-firmware --noconfirm" >> $settings_path/anarch/root/tmp/delete_stuff
 	echo "exit" >> $settings_path/anarch/root/tmp/delete_stuff
 	chroot $settings_path/anarch/root bash /tmp/delete_stuff
-
-	decoration_line _
-	decoration_text_centered "Setting up your keyring..."
-	echo
 
 	echo "#!/bin/bash" > $settings_path/anarch/root/tmp/keyring_setup
 	echo "pacman-key --init" >> $settings_path/anarch/root/tmp/keyring_setup
@@ -168,18 +90,10 @@ install_misc_setup()
 	echo "exit" >> $settings_path/anarch/root/tmp/keyring_setup
 	chroot $settings_path/anarch/root bash /tmp/keyring_setup
 
-	decoration_line _
-	decoration_text_centered "Installing base-devel, wget, git, and tigervnc..."
-	echo
-
 	echo "#!/bin/bash" > $settings_path/anarch/root/tmp/misc_setup
 	echo "pacman -S nano base-devel wget git tigervnc --noconfirm" >> $settings_path/anarch/root/tmp/misc_setup
 	echo "exit" >> $settings_path/anarch/root/tmp/misc_setup
 	chroot $settings_path/anarch/root bash /tmp/misc_setup
-
-	decoration_line _
-	decoration_text_centered "Setting up servicectl..."
-	echo
 
 	echo "#!/bin/bash" > $settings_path/anarch/root/tmp/servicectl_setup
 	echo "cd /tmp" >> $settings_path/anarch/root/tmp/servicectl_setup
@@ -190,13 +104,10 @@ install_misc_setup()
 	echo "rm a.tar.gz" >> $settings_path/anarch/root/tmp/servicectl_setup
 	echo "exit" >> $settings_path/anarch/root/tmp/servicectl_setup
 	chroot $settings_path/anarch/root bash /tmp/servicectl_setup
-
 }
 
 install_finished()
 {
-	echo
-	echo
 	decoration_line =
 	decoration_text_centered "Installation completed!"
 	echo
@@ -211,156 +122,3 @@ install_finished()
 	decoration_line =
 	chroot $settings_path/anarch/root /bin/bash -l
 }
-
-install()
-{
-	echo
-	decoration_line _
-	decoration_text_centered "Starting installation..."
-	echo
-	
-	install_directory_structure
-
-	install_profile_setup
-
-	install_mount
-
-	install_create_scripts
-
-	install_misc_setup
-
-	install_finished
-}
-
-settings_get_path()
-{
-	echo
-	decoration_line _
-	decoration_text_centered "Where do you want to install the rootfs?"
-	echo
-	read -p 'Enter a path: ' settings_path
-
-	if [ ! -d "$settings_path" ]
-	then
-  		mkdir $settings_path
-		echo
-		decoration_line _
-		decoration_text_centered "$settings_path directory created!"
-
-		settings_get_disksize
-	else
-		settings_get_disksize
-	fi
-}
-
-settings_get_disksize()
-{
-
-	echo
-	decoration_line _
-	decoration_text_centered "How many gigabytes should your disk image file be?"
-	decoration_text_centered "It must be 4GB or larger!"
-	echo
-	read -p 'Enter your disk size: ' settings_disksize
-
-	# Get available space at $settings_path
-	check_available_space $settings_path 11
-
-	if [[ $settings_disksize -gt $settings_available_space ]]
-	then
-		echo
-		decoration_line !
-    	decoration_text_centered "Not enough space!"
-    	settings_get_disksize
-	else
-		if [[ ! $settings_disksize =~ ^[0-9]+$ ]]
-		then
-			echo
-			decoration_line !
-    		decoration_text_centered "Thats not a number!"
-    		settings_get_disksize
-		else
-			if [ $settings_disksize -lt 4 ]
-			then
-				echo
-				decoration_line !
-				decoration_text_centered "Disk size needs to be 4 GB or larger!"
-				settings_get_disksize
-			else
-				settings_get_mountstorage
-			fi
-		fi
-	fi
-}
-
-settings_get_mountstorage()
-{
-	echo
-	decoration_line _
-	decoration_text_centered "Do you want to mount your internal storage in the chroot container?"
-	decoration_text_centered "Accepted inputs: \"yes\" or \"no\""
-	echo
-	read -p 'Answer: ' settings_mountstorage
-
-	if [ $settings_mountstorage = "yes" ]
-	then
-		echo
-		decoration_line _
-		decoration_text_centered "The installer will mount your internal storage!"
-		settings_verification
-	elif [ $settings_mountstorage = "no" ]
-	then
-		echo
-		decoration_line _
-		decoration_text_centered "The installer will not mount your internal storage!"
-		settings_verification
-	else
-		echo
-		decoration_line !
-		decoration_text_centered "Invalid input, type \"yes\", or \"no\"."
-		echo
-		settings_get_mountstorage
-	fi
-}
-
-settings_verification()
-{
-	echo
-	decoration_line _
-	decoration_text_centered "Location: $settings_path"
-	decoration_text_centered "Img size: $settings_disksize GB"
-	decoration_text_centered "Mount storage: $settings_mountstorage"
-	echo
-	decoration_text_centered "Are these settings correct?"
-	decoration_text_centered "Type \"yes\" to continue, or \"no\" to exit."
-	echo
-	read -p 'Answer: ' settings_verification_answer
-
-	if [ $settings_verification_answer = "yes" ]
-	then
-		install
-	elif [ $settings_verification_answer = "no" ]
-	then
-		echo
-		decoration_line _
-		decoration_text_centered "Exiting installation..."
-	else
-		echo
-		decoration_line !
-		decoration_text_centered "Invalid input, type \"yes\", or \"no\"."
-		echo
-		settings_verification
-	fi
-}
-
-settings_get()
-{
-	decoration_line _
-	decoration_text_centered "The installer will ask you for a few variables!"
-	settings_get_path
-}
-
-check_root
-
-# Installer script created by: Selirra
-# https://github.com/selirra/anarch

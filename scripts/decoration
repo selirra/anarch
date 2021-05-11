@@ -1,0 +1,17 @@
+decoration_line()
+{
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" | tr ' ' $1
+}
+
+decoration_text_centered()
+{
+	title=$1
+	printf '%*s\n' $(((${#title}+$COLUMNS)/2)) "$title"
+}
+
+decoration_message()
+{
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" | tr ' ' $1
+	title=$2
+	printf '%*s\n' $(((${#title}+$COLUMNS)/2)) "$title"
+}
