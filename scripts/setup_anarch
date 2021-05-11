@@ -77,7 +77,6 @@ install_profile_setup()
 	rm $settings_path/anarch/root/etc/resolv.conf
 	echo "nameserver 8.8.8.8" > $settings_path/anarch/root/etc/resolv.conf
 	echo "export HOME=/root" >> $settings_path/anarch/root/etc/profile
-	echo "export $(dbus-launch)" >> $settings_path/anarch/root/etc/profile
 	echo "unset LD_PRELOAD" >> $settings_path/anarch/root/etc/profile
 	echo "cd ~" >> $settings_path/anarch/root/etc/profile
 }
