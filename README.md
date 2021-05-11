@@ -25,7 +25,7 @@ Download, and then run the script as root.
 `git clone https://github.com/selirra/anarch`  
 `cd anarch`  
 `su`  
-`bash setup_anarch`  
+`bash scripts/setup_anarch`  
 
 You will be asked for an installation path, the size of the created disk.img file, and whether you want to mount your internal storage in the container.  
 
