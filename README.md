@@ -59,14 +59,7 @@ You will find the mount, unmount, and start scripts at "/your/installation/path/
 ### Desktop environments that i tried:  
 * Xfce, LXDE, and Plasma works without major errors.  
 * After installing Plasma, run `echo "export $(dbus-launch)" >> /etc/profile`.
-
-### Issues:  
-* Ping doesn't work for me.
-* Dns resolving on user accounts doesn't work for me.
-* I modified the makepkg command to not check for root, but even then i couldn't install AUR packages, because it ran into some errors with fakeroot.  
-
-Let me know if you know how to fix these issues, thank you!
-
+  
 ### Credits:
 * To get around systemd's limitations in chroot, i used Smaknsk's servicectl utility.
 * https://github.com/smaknsk/servicectl
