@@ -13,6 +13,14 @@ check_root()
 	fi
 }
 
+check_available_space()
+{
+    N=$2
+    DISKLOC=$1
+    DISKINFO=$(df -h $DISKLOC)
+    settings_available_space=$(echo $DISKINFO | awk -v N=$N '{print $N}' | tr -d G)
+}
+
 decoration_line()
 {
 	printf '%*s\n' "${COLUMNS:-$(tput cols)}" | tr ' ' $1
@@ -46,7 +54,7 @@ install_directory_structure()
 	echo
 
 	wget -O archlinuxarm.tar.gz http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz
-	losetup /dev/block/loop7 $settings_path/anarch/disk.img
+	losetup -f $settings_path/anarch/disk.img
 	mount -t ext4 /dev/block/loop7 $settings_path/anarch/root
 	cd $settings_path/anarch/root
 
@@ -69,6 +77,7 @@ install_profile_setup()
 	rm $settings_path/anarch/root/etc/resolv.conf
 	echo "nameserver 8.8.8.8" > $settings_path/anarch/root/etc/resolv.conf
 	echo "export HOME=/root" >> $settings_path/anarch/root/etc/profile
+	echo "export $(dbus-launch)" >> $settings_path/anarch/root/etc/profile
 	echo "unset LD_PRELOAD" >> $settings_path/anarch/root/etc/profile
 	echo "cd ~" >> $settings_path/anarch/root/etc/profile
 }
@@ -103,7 +112,7 @@ install_create_scripts()
 	echo
 
 	echo "#!/bin/bash" > $settings_path/anarch/mount_anarch
-	echo "losetup /dev/block/loop7 disk.img" >> $settings_path/anarch/mount_anarch
+	echo "losetup -f disk.img" >> $settings_path/anarch/mount_anarch
 	echo "mount -t ext4 /dev/block/loop7 root" >> $settings_path/anarch/mount_anarch
 	echo "mount -o bind /dev root/dev" >> $settings_path/anarch/mount_anarch
 	echo "mount -t proc  proc root/proc" >> $settings_path/anarch/mount_anarch
@@ -129,7 +138,7 @@ install_create_scripts()
 	echo "umount -l root/proc" >> $settings_path/anarch/unmount_anarch
 	echo "umount -l root/dev" >> $settings_path/anarch/unmount_anarch
 	echo "umount -l root" >> $settings_path/anarch/unmount_anarch
-	echo "losetup -d /dev/block/loop7" >> $settings_path/anarch/unmount_anarch
+	echo "losetup -D" >> $settings_path/anarch/unmount_anarch
 
 	echo "#!/bin/bash" > $settings_path/anarch/start_anarch
 	echo "chroot root /bin/bash -l" >> $settings_path/anarch/start_anarch
@@ -247,6 +256,7 @@ settings_get_path()
 
 settings_get_disksize()
 {
+
 	echo
 	decoration_line _
 	decoration_text_centered "How many gigabytes should your disk image file be?"
@@ -254,21 +264,32 @@ settings_get_disksize()
 	echo
 	read -p 'Enter your disk size: ' settings_disksize
 
-	if [[ ! $settings_disksize =~ ^[0-9]+$ ]]
+	# Get available space at $settings_path
+	check_available_space $settings_path 11
+
+	if [[ $settings_disksize -gt $settings_available_space ]]
 	then
 		echo
 		decoration_line !
-    	decoration_text_centered "Thats not a number!"
+    	decoration_text_centered "Not enough space!"
     	settings_get_disksize
 	else
-		if [ $settings_disksize -lt 4 ]
+		if [[ ! $settings_disksize =~ ^[0-9]+$ ]]
 		then
 			echo
 			decoration_line !
-			decoration_text_centered "Disk size needs to be 4 GB or larger!"
-			settings_get_disksize
+    		decoration_text_centered "Thats not a number!"
+    		settings_get_disksize
 		else
-			settings_get_mountstorage
+			if [ $settings_disksize -lt 4 ]
+			then
+				echo
+				decoration_line !
+				decoration_text_centered "Disk size needs to be 4 GB or larger!"
+				settings_get_disksize
+			else
+				settings_get_mountstorage
+			fi
 		fi
 	fi
 }
