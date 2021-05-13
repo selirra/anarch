@@ -38,7 +38,7 @@ You will find the mount, unmount, and start scripts at "/your/installation/path/
 
 ### If you want VNC:  
 * Create a password for your vnc server with `vncpasswd`  
-* To change your vnc server's resolution, run `echo "geometry="your_desired_resolution" > ~/.vnc/config`.  
+* To change your vnc server's resolution, run `echo "geometry='your_desired_resolution'" > ~/.vnc/config`.  
 * Run `vncserver :0` to start your vnc server.  
 
 ### If you want SSH:  
