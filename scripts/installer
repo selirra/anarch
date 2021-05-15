@@ -8,8 +8,11 @@ install_base()
 
 	wget -O archlinuxarm.tar.gz http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz
 
+	currentdir=${PWD##*/}
 	losetup -f $settings_path/disk.img
-	mount -t ext4 /dev/block/loop3 $settings_path/root
+	mountpoint=$(losetup -a | grep $currentdir | awk '{print $1}' | tr -d :)
+	mount -t ext4 $mountpoint $settings_path/root
+
 	cd $settings_path/root
 
 	tar -xf $settings_path/archlinuxarm.tar.gz
