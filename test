@@ -1,0 +1,6 @@
+#!/bin/bash
+
+CURRENTDIR=${PWD##*/}
+echo $CURRENTDIR
+asd=$(pwd | grep $CURRENTDIR | tr -d /)
+echo $asd

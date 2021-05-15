@@ -1,0 +1,86 @@
+settings_get_path()
+{
+	read -p 'Enter a path: ' settings_path
+
+	if [ ! -d "$settings_path" ]
+	then
+  		mkdir $settings_path
+		echo
+		decoration_line _
+		decoration_text_centered "$settings_path directory created!"
+	fi
+
+    export settings_path
+}
+
+settings_get_disksize()
+{
+	read -p 'Enter your disk size: ' settings_disksize
+
+	if [[ $settings_disksize -gt $settings_available_space ]]
+	then
+		echo
+		decoration_message ! "Not enough space!"
+		echo
+    	settings_get_disksize
+	else
+		if [[ ! $settings_disksize =~ ^[0-9]+$ ]]
+		then
+			echo
+			decoration_message ! "That's not a number!"
+			echo
+    		settings_get_disksize
+		else
+			if [ $settings_disksize -lt 4 ]
+			then
+				echo
+				decoration_message ! "Disk size needs to be larger than 4GB!"
+				echo
+				settings_get_disksize
+			else
+				export settings_disksize
+			fi
+		fi
+	fi
+}
+
+settings_get_mountstorage()
+{
+	read -p 'Answer: ' settings_mountstorage
+
+	if [ $settings_mountstorage = "yes" ]
+	then
+		export settings_mountstorage
+	elif [ $settings_mountstorage = "no" ]
+	then
+		export settings_mountstorage
+	else
+		echo
+		decoration_message ! "Invalid input, type \"yes\", or \"no\"." 
+		echo
+		settings_get_mountstorage
+	fi
+}
+
+settings_verification()
+{
+	read -p 'Answer: ' settings_verification_answer
+
+	if [ $settings_verification_answer = "yes" ]
+	then
+		return
+	elif [ $settings_verification_answer = "no" ]
+	then
+		echo
+		decoration_line _
+		decoration_text_centered "Exiting installation..."
+
+        exit 1
+	else
+		echo
+		decoration_line !
+		decoration_text_centered "Invalid input, type \"yes\", or \"no\"."
+		echo
+		settings_verification
+	fi
+}
