@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Unmounting all the stuff
+umount -l root/sdcard
+umount -l root/dev/pts
+umount -l root/tmp
+umount -l root/sys
+umount -l root/proc
+umount -l root/dev
+umount -l root
+
+# Detaching all loop devices
+losetup -D
+
+# DEBUG: Listing all attached loop devices
+losetup -a
