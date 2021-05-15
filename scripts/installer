@@ -15,6 +15,7 @@ install_base()
 
 	cd $settings_path/root
 
+	decoration_message ~ "Extracting the rootfs, please wait..."
 	tar -xf $settings_path/archlinuxarm.tar.gz
 	rm $settings_path/archlinuxarm.tar.gz
 	cd $settings_path
@@ -47,7 +48,7 @@ install_mount_internal()
 install_scripts()
 {
 	echo "#!/bin/bash" > $settings_path/mount_anarch
-	echo "currentdir=\${PWD##*/}" >> $settings_path
+	echo "currentdir=\${PWD##*/}" >> $settings_path/mount_anarch
 	echo "losetup -f disk.img" >> $settings_path/mount_anarch
 	echo "mountpoint=\$(losetup -a | grep \$currentdir | awk '{print \$1}' | tr -d :)" >> $settings_path/mount_anarch
 	echo "mount -t ext4 \$mountpoint root" >> $settings_path/mount_anarch
