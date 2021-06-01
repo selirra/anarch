@@ -30,9 +30,11 @@ install_mount()
 	decoration_message _ "Mounting the filesystem..."
 
 	mount -o bind /dev $settings_installpath/root/dev
+	mkdir -p $settings_installpath/root/dev/shm
 	mount -t proc proc $settings_installpath/root/proc
 	mount -t sysfs sysfs $settings_installpath/root/sys
 	mount -t tmpfs tmpfs $settings_installpath/root/tmp
+	mount -t tmpfs tmpfs $settings_installpath/root/dev/shm
 	mount -t devpts devpts $settings_installpath/root/dev/pts
 }
 
@@ -48,8 +50,8 @@ install_scripts()
 	decoration_message _ "Creating startup scripts..."
 
 	echo "#!/bin/bash" > $settings_installpath/mount_anarch
-	echo "mkdir -p $settings_installpath/root/dev/shm"
 	echo "mount -o bind /dev $settings_installpath/root/dev" >> $settings_installpath/mount_anarch
+	echo "mkdir -p $settings_installpath/root/dev/shm" >> $settings_installpath/mount_anarch
 	echo "mount -t proc  proc $settings_installpath/root/proc" >> $settings_installpath/mount_anarch
 	echo "mount -t sysfs sysfs $settings_installpath/root/sys" >> $settings_installpath/mount_anarch
 	echo "mount -t tmpfs tmpfs $settings_installpath/root/tmp" >> $settings_installpath/mount_anarch
