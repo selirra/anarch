@@ -1,16 +1,23 @@
 install_base()
 {
+	decoration_message _ "Starting installation..."
+	decoration_text_centered "Do not turn off your device!"
+
 	mkdir -p $settings_installpath/root/sdcard
 	cd $settings_installpath
 	wget -O archlinuxarm.tar.gz http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz
 	cd $settings_installpath/root
-	tar -xf $settings_installpath/archlinuxarm.tar.gz --checkpoint=.100
+
+	decoration_message _ "Extracting the rootfs, this might take a while..."
+	tar -xf $settings_installpath/archlinuxarm.tar.gz
 	rm $settings_installpath/archlinuxarm.tar.gz
 	cd $settings_installpath
 }
 
 install_profile()
 {
+	decoration_message _ "Setting up your profile..."
+
 	rm $settings_installpath/root/etc/resolv.conf
 	echo "nameserver 8.8.8.8" > $settings_installpath/root/etc/resolv.conf
 	echo "export HOME=/root" >> $settings_installpath/root/etc/profile
@@ -20,6 +27,8 @@ install_profile()
 
 install_mount()
 {
+	decoration_message _ "Mounting the filesystem..."
+
 	mount -o bind /dev $settings_installpath/root/dev
 	mount -t proc proc $settings_installpath/root/proc
 	mount -t sysfs sysfs $settings_installpath/root/sys
@@ -29,11 +38,15 @@ install_mount()
 
 install_mount_internal()
 {
+    decoration_message _ "Mounting your internal storage..."
+	
 	mount -o bind /sdcard $settings_installpath/root/sdcard
 }
 
 install_scripts()
 {
+	decoration_message _ "Creating startup scripts..."
+
 	echo "#!/bin/bash" > $settings_installpath/mount_anarch
 	echo "mkdir -p $settings_installpath/root/dev/shm"
 	echo "mount -o bind /dev $settings_installpath/root/dev" >> $settings_installpath/mount_anarch
@@ -65,6 +78,8 @@ install_scripts()
 
 install_misc()
 {
+	decoration_message _ "Setting up the keyring, package manager, and servicectl..."
+
 	sed -i 's/#IgnorePkg   =/IgnorePkg   = linux-aarch64 linux-firmware/' $settings_installpath/root/etc/pacman.conf
 	sed -i 's/CheckSpace/#CheckSpace/' $settings_installpath/root/etc/pacman.conf
 

@@ -5,71 +5,49 @@ done
 
 clear
 
-decoration_message _ "Checking root access."
 check_root
 
 echo
 
-decoration_message _ "Checking available storage space."
 check_available_space
 
 echo
 
-decoration_message _ "The installer will create a directory for your linux rootfs, enter it's name!"
-decoration_text_centered "It will be located inside '/data/linux/'!"
 settings_get_path
 
 echo
 
-decoration_message _ "Do you want to mount your internal storage in the container?"
-decoration_text_centered "(Yes / No)"
 settings_get_mountstorage
 
 echo
 
-decoration_line _
-decoration_text_centered "Installation path: $settings_installpath"
-decoration_text_centered "Mount internal storage: $settings_mountstorage"
-
-echo
-
-decoration_message _ "Are these settings correct?"
-decoration_text_centered "(Yes / No)"
 settings_verification
 
 echo
 
-decoration_message "\~" "Starting installation..."
-decoration_text_centered "Do not turn off your device!"
 install_base
 
 echo
 
-decoration_message "\~" "Setting up your profile..."
 install_profile
 
 echo
 
-decoration_message "\~" "Mounting the filesystem..."
 install_mount
 
 echo
 
 if [ $settings_mountstorage = "yes" ]
 then
-    decoration_message "\~" "Mounting your internal storage..."
     install_mount_internal
 fi
 
-
 echo
 
-decoration_message "\~" "Creating startup scripts..."
 install_scripts
 
 echo
 
-decoration_message "\~" "Setting up the package manager..."
 install_misc
 
 echo

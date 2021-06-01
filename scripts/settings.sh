@@ -1,5 +1,8 @@
 settings_get_path()
 {
+	decoration_message _ "The installer will create a directory for your linux rootfs, enter it's name!"
+	decoration_text_centered "It will be located inside '/data/linux/'!"
+
 	read -p 'Enter a path: ' settings_installdir
 
 	settings_installpath="/data/linux/"$settings_installdir
@@ -17,6 +20,9 @@ settings_get_path()
 
 settings_get_mountstorage()
 {
+	decoration_message _ "Do you want to mount your internal storage in the container?"
+	decoration_text_centered "(Yes / No)"
+
 	read -p 'Answer: ' settings_mountstorage
 
 	if [ $settings_mountstorage = "yes" ]
@@ -35,6 +41,12 @@ settings_get_mountstorage()
 
 settings_verification()
 {
+	decoration_message _ "Installation path: $settings_installpath"
+	decoration_text_centered "Mount internal storage: $settings_mountstorage"
+	echo
+	decoration_message _ "Are these settings correct?"
+	decoration_text_centered "(Yes / No)"
+
 	read -p 'Answer: ' settings_verification_answer
 
 	if [ $settings_verification_answer = "yes" ]
