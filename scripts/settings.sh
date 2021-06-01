@@ -9,7 +9,7 @@ settings_get_path()
 
 	if [ ! -z $settings_installdir ]
 	then
-		if [ $settings_installdir = *[!\ ]* ]
+		if [[ $settings_installdir = *[!\ ]* ]]
 		then
 			if [ ! -d "$settings_installpath" ]
 			then
