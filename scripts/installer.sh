@@ -3,7 +3,7 @@ install_create_dir()
 	decoration_message _ "Creating \"anarch\" directory at your device's root..."
 	
 	mount -o rw,remount /
-	mkdir /linux
+	mkdir /anarch
 	mount -o ro,remount /
 }
 
