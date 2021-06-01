@@ -18,7 +18,10 @@ settings_get_path()
 
 	if [ ! -L /anarch ]
 	then
-  		ln -sf /data/anarch /anarch 
+  		
+		mount -o rw,remount /
+		ln -sf /data/anarch /anarch
+		mount -o ro,remount /
 
 		echo
 		decoration_message _ "'/data/anarch' symlink created at your device's root directory!"
