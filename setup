@@ -9,11 +9,6 @@ check_root
 
 check_available_space
 
-decoration_message _ "Creating \"anarch\" directory at your device's root..."
-mount -o rw,remount /
-mkdir -p /anarch
-mount -o ro,remount /
-
 settings_get_path
 
 settings_get_mountstorage
