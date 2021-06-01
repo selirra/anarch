@@ -1,3 +1,12 @@
+install_create_dir()
+{
+	decoration_message _ "Creating \"anarch\" directory at your device's root..."
+	
+	mount -o rw,remount /
+	mkdir /linux
+	mount -o ro,remount /
+}
+
 install_base()
 {
 	decoration_message _ "Starting installation..."

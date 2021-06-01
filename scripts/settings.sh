@@ -1,18 +1,18 @@
 settings_get_path()
 {
 	decoration_message _ "The installer will create a directory for your linux rootfs, enter it's name!"
-	decoration_text_centered "It will be located inside '/data/linux/'!"
+	decoration_text_centered "It will be located inside '/anarch'!"
 
 	read -p 'Enter a path: ' settings_installdir
 
-	settings_installpath="/data/linux/"$settings_installdir
+	settings_installpath="/anarch/"$settings_installdir
 
 	if [ ! -d "$settings_installpath" ]
 	then
   		mkdir -p $settings_installpath
 		echo
 		decoration_line _
-		decoration_text_centered "$settings_installdir directory created in /data/linux!"
+		decoration_text_centered "$settings_installdir directory created in '/anarch'!"
 	fi
 
 	return

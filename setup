@@ -7,50 +7,28 @@ clear
 
 check_root
 
-echo
-
 check_available_space
-
-echo
 
 settings_get_path
 
-echo
-
 settings_get_mountstorage
-
-echo
 
 settings_verification
 
-echo
-
 install_base
-
-echo
 
 install_profile
 
-echo
-
 install_mount
-
-echo
 
 if [ $settings_mountstorage = "yes" ]
 then
     install_mount_internal
 fi
 
-echo
-
 install_scripts
 
-echo
-
 install_misc
-
-echo
 
 decoration_install_finished
 chroot $settings_installpath/root /bin/bash -l
