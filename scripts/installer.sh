@@ -2,13 +2,9 @@ install_base()
 {
 	mkdir -p $settings_installpath/root/sdcard
 	cd $settings_installpath
-
 	wget -O archlinuxarm.tar.gz http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz
-
 	cd $settings_installpath/root
-
-	decoration_message ~ "Extracting the rootfs, please wait..."
-	tar -xf $settings_installpath/archlinuxarm.tar.gz
+	tar -xf $settings_installpath/archlinuxarm.tar.gz --checkpoint=.100
 	rm $settings_installpath/archlinuxarm.tar.gz
 	cd $settings_installpath
 }
@@ -39,29 +35,32 @@ install_mount_internal()
 install_scripts()
 {
 	echo "#!/bin/bash" > $settings_installpath/mount_anarch
-	echo "mount -o bind /dev root/dev" >> $settings_installpath/mount_anarch
-	echo "mount -t proc  proc root/proc" >> $settings_installpath/mount_anarch
-	echo "mount -t sysfs sysfs root/sys" >> $settings_installpath/mount_anarch
-	echo "mount -t tmpfs tmpfs root/tmp" >> $settings_installpath/mount_anarch
-	echo "mount -t devpts devpts root/dev/pts" >> $settings_installpath/mount_anarch
+	echo "mkdir -p $settings_installpath/root/dev/shm"
+	echo "mount -o bind /dev $settings_installpath/root/dev" >> $settings_installpath/mount_anarch
+	echo "mount -t proc  proc $settings_installpath/root/proc" >> $settings_installpath/mount_anarch
+	echo "mount -t sysfs sysfs $settings_installpath/root/sys" >> $settings_installpath/mount_anarch
+	echo "mount -t tmpfs tmpfs $settings_installpath/root/tmp" >> $settings_installpath/mount_anarch
+	echo "mount -t tmpfs tmpfs $settings_installpath/root/dev/shm" >> $settings_installpath/mount_anarch
+	echo "mount -t devpts devpts $settings_installpath/root/dev/pts" >> $settings_installpath/mount_anarch
     if [ $settings_mountstorage = "yes" ]
 	then
-		echo "mount -o bind /sdcard root/sdcard" >> $settings_installpath/mount_anarch
+		echo "mount -o bind /sdcard $settings_installpath/root/sdcard" >> $settings_installpath/mount_anarch
 	fi
 	
 	echo "#!/bin/bash" > $settings_installpath/unmount_anarch
 	if [ $settings_mountstorage = "yes" ]
 	then
-		echo "umount -l root/sdcard" >> $settings_installpath/unmount_anarch
+		echo "umount -l $settings_installpath/root/sdcard" >> $settings_installpath/unmount_anarch
 	fi	
-	echo "umount -l root/dev/pts" >> $settings_installpath/unmount_anarch
-	echo "umount -l root/tmp" >> $settings_installpath/unmount_anarch
-	echo "umount -l root/sys" >> $settings_installpath/unmount_anarch
-	echo "umount -l root/proc" >> $settings_installpath/unmount_anarch
-	echo "umount -l root/dev" >> $settings_installpath/unmount_anarch
+	echo "umount -l $settings_installpath/root/dev/pts" >> $settings_installpath/unmount_anarch
+	echo "umount -l $settings_installpath/root/dev/shm" >> $settings_installpath/unmount_anarch
+	echo "umount -l $settings_installpath/root/tmp" >> $settings_installpath/unmount_anarch
+	echo "umount -l $settings_installpath/root/sys" >> $settings_installpath/unmount_anarch
+	echo "umount -l $settings_installpath/root/proc" >> $settings_installpath/unmount_anarch
+	echo "umount -l $settings_installpath/root/dev" >> $settings_installpath/unmount_anarch
 
 	echo "#!/bin/bash" > $settings_installpath/start_anarch
-	echo "chroot root /bin/bash -l" >> $settings_installpath/start_anarch
+	echo "chroot $settings_installpath/root /bin/bash -l" >> $settings_installpath/start_anarch
 }
 
 install_misc()
@@ -96,21 +95,9 @@ install_misc()
 	echo "rm a.tar.gz" >> $settings_installpath/root/tmp/servicectl_setup
 	echo "exit" >> $settings_installpath/root/tmp/servicectl_setup
 	chroot $settings_installpath/root bash /tmp/servicectl_setup
-}
 
-install_finished()
-{
-	decoration_line =
-	decoration_text_centered "Installation completed!"
-	echo
-	decoration_text_centered "From now on, you can enter your chroot by running"
-	decoration_text_centered "the mount, and start scripts in your anarch folder!"
-	echo
-	decoration_text_centered "Installer script created by: Selirra"
-	decoration_text_centered "https://github.com/selirra"
-	echo
-	decoration_text_centered "Servicectl utility created by: Smaknsk"
-	decoration_text_centered "https://github.com/smaknsk/servicectl"
-	decoration_line =
-	chroot $settings_installpath/root /bin/bash -l
+	rm -rf $settings_installpath/root/tmp/delete_stuff
+	rm -rf $settings_installpath/root/tmp/keyring_setup
+	rm -rf $settings_installpath/root/tmp/misc_setup
+	rm -rf $settings_installpath/root/tmp/servicectl_setup
 }
