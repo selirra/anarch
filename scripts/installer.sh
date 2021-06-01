@@ -1,8 +1,3 @@
-install_create_dir()
-{
-
-}
-
 install_base()
 {
 	decoration_message _ "Starting installation..."

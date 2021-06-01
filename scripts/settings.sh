@@ -7,28 +7,42 @@ settings_get_path()
 
 	settings_installpath="/data/anarch/"$settings_installdir
 
-	if [ ! -d "$settings_installpath" ]
+	if [ ! -z $settings_installdir ]
 	then
-  		mkdir -p $settings_installpath
+		if [ $settings_installdir = *[!\ ]* ]
+		then
+			if [ ! -d "$settings_installpath" ]
+			then
+  				mkdir -p $settings_installpath
 
+				echo
+				decoration_message _ "$settings_installdir directory created in '/data/anarch'!"
+				echo
+			fi
+
+			if [ ! -L /anarch ]
+			then
+				mount -o rw,remount /
+				ln -sf /data/anarch /anarch
+				mount -o ro,remount /
+
+				echo
+				decoration_message _ "'/data/anarch' symlink created at your device's root directory!"
+				echo
+			fi
+
+			return
+
+		else
+			decoration_message ! "Directory name consists of spaces only!"
+		fi
+	else
 		echo
-		decoration_message _ "$settings_installdir directory created in '/data/anarch'!"
+		decoration_message ! "Directory name can not be empty!"
 		echo
+
+		settings_get_path
 	fi
-
-	if [ ! -L /anarch ]
-	then
-  		
-		mount -o rw,remount /
-		ln -sf /data/anarch /anarch
-		mount -o ro,remount /
-
-		echo
-		decoration_message _ "'/data/anarch' symlink created at your device's root directory!"
-		echo
-	fi
-
-	return
 }
 
 settings_get_mountstorage()
