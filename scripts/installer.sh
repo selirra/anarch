@@ -76,6 +76,16 @@ install_scripts()
 
 	echo "#!/bin/bash" > $settings_installpath/start_anarch
 	echo "chroot $settings_installpath/root /bin/bash -l" >> $settings_installpath/start_anarch
+
+	echo "#!/bin/bash" > $settings_installpath/remove_anarch
+	echo "umount -l $settings_installpath/root/sdcard" >> $settings_installpath/remove_anarch
+	echo "umount -l $settings_installpath/root/dev/pts" >> $settings_installpath/remove_anarch
+	echo "umount -l $settings_installpath/root/dev/shm" >> $settings_installpath/remove_anarch
+	echo "umount -l $settings_installpath/root/tmp" >> $settings_installpath/remove_anarch
+	echo "umount -l $settings_installpath/root/sys" >> $settings_installpath/remove_anarch
+	echo "umount -l $settings_installpath/root/proc" >> $settings_installpath/remove_anarch
+	echo "umount -l $settings_installpath/root/dev" >> $settings_installpath/remove_anarch
+	echo "rm -rf $settings_installpath" >> $settings_installpath/remove_anarch
 }
 
 install_misc()
@@ -99,7 +109,7 @@ install_misc()
 	chroot $settings_installpath/root bash /tmp/keyring_setup
 
 	echo "#!/bin/bash" > $settings_installpath/root/tmp/misc_setup
-	echo "pacman -S nano base-devel wget git tigervnc --noconfirm" >> $settings_installpath/root/tmp/misc_setup
+	echo "pacman -S nano base-devel wget git --noconfirm" >> $settings_installpath/root/tmp/misc_setup
 	echo "exit" >> $settings_installpath/root/tmp/misc_setup
 	chroot $settings_installpath/root bash /tmp/misc_setup
 
