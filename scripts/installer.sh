@@ -57,13 +57,13 @@ install_scripts()
 	echo "mount -t tmpfs tmpfs $settings_installpath/root/tmp" >> $settings_installpath/mount_anarch
 	echo "mount -t tmpfs tmpfs $settings_installpath/root/dev/shm" >> $settings_installpath/mount_anarch
 	echo "mount -t devpts devpts $settings_installpath/root/dev/pts" >> $settings_installpath/mount_anarch
-    if [ $settings_mountstorage = "yes" ]
+    if [ $settings_mountstorage = "y" ]
 	then
 		echo "mount -o bind /sdcard $settings_installpath/root/sdcard" >> $settings_installpath/mount_anarch
 	fi
 	
 	echo "#!/bin/bash" > $settings_installpath/unmount_anarch
-	if [ $settings_mountstorage = "yes" ]
+	if [ $settings_mountstorage = "y" ]
 	then
 		echo "umount -l $settings_installpath/root/sdcard" >> $settings_installpath/unmount_anarch
 	fi	

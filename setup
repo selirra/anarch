@@ -21,7 +21,7 @@ install_profile
 
 install_mount
 
-if [ $settings_mountstorage = "yes" ]
+if [ $settings_mountstorage = "y" ]
 then
     install_mount_internal
 fi
